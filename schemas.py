@@ -1,48 +1,36 @@
 """
-Database Schemas
+Database Schemas for Atomik (Teen-to-Teen EdTech)
 
-Define your MongoDB collection schemas here using Pydantic models.
-These schemas are used for data validation in your application.
-
-Each Pydantic model represents a collection in your database.
-Model name is converted to lowercase for the collection name:
-- User -> "user" collection
-- Product -> "product" collection
-- BlogPost -> "blogs" collection
+Each Pydantic model represents a collection in MongoDB.
+The collection name is the lowercase of the class name.
 """
 
-from pydantic import BaseModel, Field
-from typing import Optional
+from pydantic import BaseModel, Field, EmailStr
+from typing import Optional, List
 
-# Example schemas (replace with your own):
-
-class User(BaseModel):
+class Tutorprofile(BaseModel):
     """
-    Users collection schema
-    Collection name: "user" (lowercase of class name)
+    Peer tutor profiles available for booking.
+    Collection: "tutorprofile"
     """
-    name: str = Field(..., description="Full name")
-    email: str = Field(..., description="Email address")
-    address: str = Field(..., description="Address")
-    age: Optional[int] = Field(None, ge=0, le=120, description="Age in years")
-    is_active: bool = Field(True, description="Whether user is active")
+    name: str = Field(..., description="Tutor full name")
+    grade_levels: List[int] = Field(..., description="Grades the tutor can teach (8-12)")
+    subjects: List[str] = Field(..., description="Subjects the tutor teaches")
+    bio: Optional[str] = Field(None, description="Short introduction")
+    availability: Optional[str] = Field(None, description="General availability notes")
+    rating: Optional[float] = Field(None, ge=0, le=5, description="Average rating out of 5")
 
-class Product(BaseModel):
+class Teachercandidate(BaseModel):
     """
-    Products collection schema
-    Collection name: "product" (lowercase of class name)
+    Candidates applying to become tutors via aptitude test.
+    Collection: "teachercandidate"
     """
-    title: str = Field(..., description="Product title")
-    description: Optional[str] = Field(None, description="Product description")
-    price: float = Field(..., ge=0, description="Price in dollars")
-    category: str = Field(..., description="Product category")
-    in_stock: bool = Field(True, description="Whether product is in stock")
+    name: str = Field(...)
+    email: EmailStr = Field(...)
+    grade: int = Field(..., ge=8, le=12)
+    subjects: List[str] = Field(...)
+    motivation: Optional[str] = Field(None, description="Why they want to teach")
+    score: Optional[int] = Field(None, ge=0)
+    status: Optional[str] = Field(None, description="pending | passed | needs-review | rejected")
 
-# Add your own schemas here:
-# --------------------------------------------------
-
-# Note: The Flames database viewer will automatically:
-# 1. Read these schemas from GET /schema endpoint
-# 2. Use them for document validation when creating/editing
-# 3. Handle all database operations (CRUD) directly
-# 4. You don't need to create any database endpoints!
+# Note: You can extend with more collections such as Session, Booking, Feedback, etc.
